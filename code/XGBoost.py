@@ -1,15 +1,17 @@
-# Purpose: Generate Elastic Net Predictions
-# Inputs: imputed dataset with added homelessness indicators, NO feature selection
-# Outputs: predictions from best-performing parameter set
+# Purpose: Generate Gradient-Boosted Tree Predictions
+# Inputs: imputed dataset without added homelessness indicators, NO feature selection
+# Outputs: predictions from best-performing parameter set, feature importance of best models per outcome
 # Machine: 64-core cluster, ~5/6 hours
 
 
 import os
-#import Pickle as pickle
-
+import numpy as np
 import pandas as pd
 from xgboost import XGBRegressor, XGBClassifier
 from sklearn.model_selection import GridSearchCV
+
+np.random.seed(0)
+
 
 if __name__ == '__main__':
 
@@ -23,8 +25,13 @@ if __name__ == '__main__':
     #        data_df = pickle.load(fin)
     #else:
         #data_df = pd.read_csv('../data/background.csv')
-    data_df = pd.read_csv('../output/data_mean_imputed_Homeless_added.csv')
+    data_df = pd.read_csv('../output/data_mean_imputed.csv')
     data_df = data_df.set_index('challengeID')
+
+    #print(np.shape(data_df))
+    #data_df = data_df.iloc[:,1:10]
+    #print(np.shape(data_df))
+
     for i, column in enumerate(data_df):
         data_df[column] = pd.to_numeric(data_df[column], errors='coerce')
     data_df = data_df.fillna(0) # imputation
@@ -50,6 +57,8 @@ if __name__ == '__main__':
 
 
     predict_dict = {}
+    importance_dict = {}
+
     for target, cl_type in target_list:
         cur_target_df = target_df[~ target_df[target].isnull()]
         cur_data_df = data_df.ix[cur_target_df.index]
@@ -57,12 +66,16 @@ if __name__ == '__main__':
         X = cur_data_df.as_matrix()
         y = cur_target_df[target].as_matrix()
 
+        print("\n")
+        print(target)
+
         if cl_type == "c":
             clf = GridSearchCV(XGBRegressor(),
                                parameters,
                                scoring='neg_mean_squared_error',
-                               n_jobs=-1, cv=3, verbose=2)
+                               n_jobs=-1, cv=3, verbose=0)
             clf.fit(X, y)
+            print(clf.best_params_)
             pred_all = clf.predict(Xall)
 
         else:
@@ -70,13 +83,28 @@ if __name__ == '__main__':
             clf = GridSearchCV(XGBClassifier(),
                                parameters,
                                scoring='roc_auc',
-                               n_jobs=-1, cv=3, verbose=2)
-            clf.fit(X, y)
+                               n_jobs=-1, cv=3, verbose=0)
+            clf.fit(X, y)            
+            print(clf.best_params_)
             pred_all = clf.predict_proba(Xall)[:, 1]
 
         predict_dict[target] = pred_all
+        importance_dict[target] = clf.best_estimator_.feature_importances_
+
+        
+
+
+
+
 
     pred_df = pd.DataFrame(predict_dict)
     pred_df.index = data_df.index
     pred_df = pred_df.reset_index()
     pred_df.to_csv("../output/final_pred/xgboost_prediction.csv", index=False)
+
+    importance_df = pd.DataFrame(importance_dict)
+    importance_df.index = data_df.columns.values
+    importance_df = importance_df.reset_index()
+    importance_df.to_csv("../output/7_feature_importances.csv", index = False)
+
+

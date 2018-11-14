@@ -2,6 +2,7 @@
 
 # This file include random forest utility functions to be used by the Elastic Net script
 
+# Packages Used
 import sys
 import itertools
 import numpy as np
@@ -12,6 +13,10 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import make_scorer
 from sklearn.metrics import precision_score, f1_score, recall_score, accuracy_score
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# Random Seed
+np.random.seed(0)
+
 
 # function returns a custom callable scorer object to be used by grid search scoring. name
 # identifies the type of the scorer to create. Possible names are accuracy,

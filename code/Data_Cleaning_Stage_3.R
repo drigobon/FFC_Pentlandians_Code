@@ -11,8 +11,11 @@
 #
 # Machine: Laptop, Runtime ~10 mins
 
-
+# Packages Used
 require(data.table)
+
+# Random Seed
+set.seed(0)
 
 
 ## Read stage 2 csv, Features List

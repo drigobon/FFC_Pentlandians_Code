@@ -3,13 +3,16 @@
 # Outputs: Prediction file
 # Machine: Laptop, ~10/15 mins
 
-
+# Packages Used
 import argparse
 import sys
 import numpy as np
 import utils
 import models
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+# Random Seed
+np.random.seed(0)
 
 parser = argparse.ArgumentParser(
   description='Elastic net script.')
@@ -80,7 +83,7 @@ def main():
   
   all_predictions = None
   for label_column in args.label_columns:
-    #print 'Training for Label {}'.format(label_column)
+    print('Training for Label {}'.format(label_column))
     (all_features_predictions_df,
      train_features, transformed_train_labels, train_labels,
      test_features, transformed_test_labels, test_labels,
@@ -119,9 +122,9 @@ def main():
     #print 'MSE on train: {}'.format(mean_squared_error(train_y_true, train_y_pred))
     
     coefs = model.coef_
-    #print 'Optimal parameters in final model is {}'.format(best_params)
+    print('Optimal parameters in final model is {}'.format(best_params))
     # info on most predictive coefs
-    #print 'Model has {} non-zero coefficients.'.format(len(coefs[coefs != 0]))
+    print('Model has {} non-zero coefficients.'.format(len(coefs[coefs != 0])))
     highest_indices = np.abs(coefs).argsort()[::-1]
     #print 'Top predictors of {}'.format(label_column)
     for i in range(min(10, len(coefs[coefs != 0]))):
@@ -136,8 +139,8 @@ def main():
     label_predictions[label_predictions > np.max(all_labels)] = np.max(all_labels)
     all_predictions.loc[:,label_column] = label_predictions
     
-    #print('\n*****************************')
-    #print('*****************************\n')
+    print('\n*****************************')
+    print('*****************************\n')
   all_predictions.to_csv(args.output_prediction_filename)
 
 

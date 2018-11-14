@@ -3,6 +3,7 @@
 # this file includes the methods that train logistic, linear regression and multinomial
 # models and return them
 
+# Packages Used
 import collections
 import numpy as np
 import utils
@@ -17,6 +18,10 @@ from sklearn.linear_model import LassoCV, Lasso
 from sklearn.linear_model import LassoLarsCV, LassoLars
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
+
+# Random Seed
+np.random.seed(0)
+
 
 def train_model(train_features,
                 train_labels,

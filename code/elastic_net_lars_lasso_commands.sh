@@ -1,10 +1,3 @@
-# Purpose: Generate Elastic Net predictions
-# Inputs: Feature Selection file from Mutual Information (K=100 was used in this study)
-# Outputs: elastic_prediction.csv file of final predictions
-# Machine: Laptop, ~20 mins
-
-
-
 TOP_LEVEL_DIR="../"
 SCRIPTS_DIR="${TOP_LEVEL_DIR}/code/"
 RAW_DATA_DIR="${TOP_LEVEL_DIR}/data/"
@@ -15,6 +8,7 @@ PREDICTIONS_INPUT_FILE="${RAW_DATA_DIR}/prediction.csv"
 
 RESULTS_DIR="${TOP_LEVEL_DIR}/output/final_pred/"
 PREDICTIONS_PREFIX="${RESULTS_DIR}/elastic_prediction"
+PARAMETERS_PREFIX="${TOP_LEVEL_DIR}/output/elastic_parameters.txt"
 
 # number of cores to use in grid search
 NUM_JOBS=1
@@ -31,6 +25,6 @@ do
       $LABELS_INPUT_FILE \
       $PREDICTIONS_INPUT_FILE \
       ${PREDICTIONS_PREFIX}.csv > \
-      ${PREDICTIONS_PREFIX}
+      ${PARAMETERS_PREFIX}
   done 
 done
